@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+
+
+    <h1>Magic Pick</h1>
+    <img id="pic1" width="200px" src=""/>
+    <img id="pic2" width="200px" src=""/>
+    <img id="pic3" width="200px" src=""/>
+
+
+
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $.get("http://localhost:3000/sendBooster", function (data) {
+            $(".result").html(data);
+            data.mensaje.forEach(element => {
+                console.log(element.nimage_uris)
+
+            });
+            $("#pic1").attr("src", data.mensaje[0].nimage_uris);
+            $("#pic2").attr("src", data.mensaje[1].nimage_uris);
+            $("#pic3").attr("src", data.mensaje[2].nimage_uris);
+
+
+        });
+    });
+</script>
+
+</html>
