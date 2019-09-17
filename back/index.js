@@ -143,7 +143,15 @@ var getCards = function () {
 async function pickBooster(numbers) {
     console.log("4");
     console.log(numbers);
-    return await queryPromise('SELECT id, nimage_uris FROM magicbot.cards where id in (' + numbers.join() + ')');
+    let lastIdBooster = await queryPromise('SELECT boosterId FROM magicbot.booster order by id desc limit 1');
+    console.log("5");
+    let newBoosterId = lastIdBooster[0].boosterId + 1;
+    await queryPromise('insert into magicbot.booster (cardId, boosterId) VALUES ('+numbers[0]+','+ newBoosterId +'),('+numbers[1]+','+ newBoosterId +'), ('+numbers[2]+','+ newBoosterId +')');
+    console.log("6");
+    return {
+        cards: await queryPromise('SELECT id, nimage_uris FROM magicbot.cards where id in (' + numbers.join() + ')'),
+        boosterId: newBoosterId
+    };
 }
 
 function pickNumbers(total) {
@@ -160,6 +168,13 @@ async function pickTotal() {
     console.log("2");
     return await queryPromise('SELECT count(*) as total FROM cards');
 }
+
+
+async function savePick(data) {
+    console.log("1");
+    return await queryPromise('update magicbot.booster set pick = 1 WHERE cardId = '+data['pick']+' and boosterId = '+ data['boosterId']);
+}
+
 
 app.get('/', function (req, res) {
     respuesta = {
@@ -182,13 +197,22 @@ app.get('/sendBooster', async function (req, res) {
     const totals = await pickTotal();
     const numbers = await pickNumbers(totals);
     const boosters = await pickBooster(numbers);
-    
-    // boosters.forEach(function (booster){
-    //     console.log(booster.nimage_uris);
 
-    // });
 
     respuesta.mensaje = boosters;
+
+    res.send(respuesta);
+});
+
+app.post('/pickCard', async function (req, res) {
+    response = {
+        error: true,
+        codigo: 200,
+        data: 'pickCard booster'
+    };
+
+    const result = await savePick(req.body);
+    console.log("2");
 
     res.send(respuesta);
 });

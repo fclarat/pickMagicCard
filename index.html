@@ -8,9 +8,9 @@
 
 
     <h1>Magic Pick</h1>
-    <img id="pic1" width="200px" src=""/>
-    <img id="pic2" width="200px" src=""/>
-    <img id="pic3" width="200px" src=""/>
+    <a href="#"><img id="pic1" width="200px" src=""/></a>
+    <a href="#"><img id="pic2" width="200px" src=""/></a>
+    <a href="#"><img id="pic3" width="200px" src=""/></a>
 
 
 
@@ -20,17 +20,46 @@
 
 <script>
     $(document).ready(function () {
+
+        var pickeado = false;
+
         $.get("http://localhost:3000/sendBooster", function (data) {
             $(".result").html(data);
-            data.mensaje.forEach(element => {
-                console.log(element.nimage_uris)
+            // data.mensaje.forEach(element => {
+            //     console.log(element.nimage_uris)
+            // });
+console.log(data);
+            $("#pic1").attr("src", data.mensaje.cards[0].nimage_uris);
+            $("#pic1").attr("id_card", data.mensaje.cards[0].id);
+            $("#pic1").attr("booster", data.mensaje.boosterId);
+            $("#pic2").attr("src", data.mensaje.cards[1].nimage_uris);
+            $("#pic2").attr("id_card", data.mensaje.cards[1].id);
+            $("#pic2").attr("booster", data.mensaje.boosterId);
+            $("#pic3").attr("src", data.mensaje.cards[2].nimage_uris);
+            $("#pic3").attr("id_card", data.mensaje.cards[2].id);
+            $("#pic3").attr("booster", data.mensaje.boosterId);
 
+            $( "img" ).on( "click", function() {
+                if(pickeado == false)
+                {
+                    pickeado = true;
+                    $.ajax({
+                        type: "POST",
+                            url: "http://localhost:3000/pickCard",
+                            data: {
+                                boosterId: $(this).attr("booster"),
+
+                                pick: $(this).attr("id_card"),
+                                },
+                            //success: success,
+                            //dataType: dataType
+                    });
+                    //console.log($(this).attr("booster"));
+
+                    location.reload();
+                    //console.log( $( this ).text() );
+                }
             });
-            $("#pic1").attr("src", data.mensaje[0].nimage_uris);
-            $("#pic2").attr("src", data.mensaje[1].nimage_uris);
-            $("#pic3").attr("src", data.mensaje[2].nimage_uris);
-
-
         });
     });
 </script>
